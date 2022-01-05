@@ -4,19 +4,19 @@
 
 ### ConvNet Search Space
 
-| Name  | MFLOPs(M)  | Top-1 (%) |
-| :------------ |:---------------:| -----:|
-| AlphaNet-A0      | 203 | 77.87 |
-| *Cream-S*      | 287 | 77.60 |
-| AlphaNet-A1     | 279 | 78.94 |
-| AlphaNet-A2     | 317 | 79.20 |
-| AlphaNet-A3    | 357 | 79.41 |
-| AlphaNet-A4     | 444 | 80.01 |
-| *Cream-M*     | 481 | 79.20 |
-| AlphaNet-A5 (small)     | 491 | 80.29 |
-| AlphaNet-A5 (base)    | 596 | 80.62 |
-| *Cream-L*    | 604 | 80.00 |
-| AlphaNet-A6     | 709 | 80.78 | 
+| Name  | MFLOPs(M)  | Params(M) | Top-1 (%) |
+| :------------ |:---------------:| :---------------:|-----:|
+| AlphaNet-A0      | 203 | 8.9 |77.9 |
+| *Cream-S*      | 287 | 6.0 | 77.6 |
+| AlphaNet-A1     | 279 | - |79.0 |
+| AlphaNet-A2     | 317 | - |79.2 |
+| AlphaNet-A3    | 357 | - |79.4 |
+| AlphaNet-A4     | 444 | 9.7 | 80.0 |
+| *Cream-M*     | 481 | 7.7 |79.2 |
+| AlphaNet-A5 (small)     | 491 | - |80.3 |
+| AlphaNet-A5 (base)    | 596 | 11.2 |80.6 |
+| *Cream-L*    | 604 | 9.7 |80.0 |
+| AlphaNet-A6     | 709 | -| 80.8 | 
 
 ### Transformer Search Space
 
