@@ -107,12 +107,11 @@
 * Similarly to [BossNAS](https://arxiv.org/abs/2103.12424)
 * Refine search space by newly published transformer models
 
-#### Retrain 
+#### Retrain / Once for ALL 
 
 * Extremely Quick Search
     - Same as before, a few epochs/iterations are included
-* Retrain the discovered arch from PB 
+* Retrain or directly slice the discovered arch from PB 
 
-#### Once for ALL 
 
 
