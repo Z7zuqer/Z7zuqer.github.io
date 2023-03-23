@@ -1,0 +1,462 @@
+(function settingsCreateImage() {
+  let image = document.createElement("IMG");
+  image.setAttribute("src", "./images/settings.png");
+  image.setAttribute("title", "Advanced settings/functions");
+  image.style.position = "absolute";
+  image.style.right = "32%";
+  image.style.top = "155px";
+  image.style.width = "45px";
+  image.setAttribute("class", "clickableImage");
+  image.setAttribute("id", "settingsModalBtn");
+  //image.style.margin = "0px 0px -2px 20px"
+
+  let allText = document.getElementById("allText");
+  allText.appendChild(image);
+})();
+
+(function settingsCreateModal() {
+  let checkbox, label, div, text;
+
+  //SETTINGS MODAL + BACKGROUND
+  let settingsModal = document.createElement("div");
+  settingsModal.setAttribute("class", "modal");
+  settingsModal.setAttribute("id", "settingsModal");
+  document.body.appendChild(settingsModal);
+
+  let settingsModalContent = document.createElement("div");
+  settingsModalContent.setAttribute("class", "modal-content");
+  settingsModal.appendChild(settingsModalContent);
+
+  let closeSpan = document.createElement("span");
+  closeSpan.setAttribute("class", "close");
+  closeSpan.setAttribute("id", "closeSettingsModal");
+  closeSpan.innerHTML += "&times";
+  settingsModalContent.appendChild(closeSpan);
+
+  let newcontent = document.createElement("div");
+  newcontent.innerHTML = "<br>";
+  newcontent.innerHTML += "<b>Settings:</b><br>";
+  newcontent.innerHTML += "<br><br>";
+  settingsModalContent.appendChild(newcontent);
+
+  //WINDOWING
+
+  div = document.createElement("div");
+  text = document.createElement("text");
+  text.innerHTML = "Windowing. Min:";
+  div.appendChild(text);
+
+  let inputMin = document.createElement("input");
+  inputMin.setAttribute("id", "windowingInputMin");
+  inputMin.style.width = "40px";
+  inputMin.addEventListener("input", function() {
+    let min = parseFloat(inputMin.value);
+    let max = parseFloat(inputMax.value);
+    changeWindowing(min, max, false, false);
+  });
+  div.appendChild(inputMin);
+
+  text = document.createElement("text");
+  text.innerHTML = " Max: ";
+  div.appendChild(text);
+
+  inputMax = document.createElement("input");
+  inputMax.style.width = "40px";
+  inputMax.setAttribute("id", "windowingInputMax");
+  inputMax.addEventListener("input", function() {
+    let min = parseFloat(inputMin.value);
+    let max = parseFloat(inputMax.value);
+    changeWindowing(min, max, false, false);
+  });
+  /* inputToVal.addEventListener("click", function(){
+        inputToVal.select()
+    }) */
+  div.appendChild(inputMax);
+
+  text = document.createElement("text");
+  text.innerHTML = "<br><br>";
+  div.appendChild(text);
+
+  div.setAttribute(
+    "title",
+    "To manually enter min and max values for windowing"
+  );
+  settingsModalContent.appendChild(div);
+
+  //INTERPOLATION RAW IMAGE
+  checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.setAttribute("class", "pointerCursor");
+  checkbox.setAttribute("id", "interpolChBox");
+  checkbox.checked = true;
+  checkbox.addEventListener("click", function() {
+    interpolActive = document.getElementById("interpolChBox").checked;
+    if (interpolActive) {
+      bg_canvas.style.imageRendering = "auto";
+    } else {
+      bg_canvas.style.imageRendering = "pixelated";
+    }
+    drawCanvas(thectx);
+  });
+  settingsModalContent.appendChild(checkbox);
+
+  label = document.createElement("label");
+  label.setAttribute("for", "interpolChBox");
+  label.setAttribute("title", "Interpolation of raw image data");
+  label.innerHTML = "Interpolation";
+  settingsModalContent.appendChild(label);
+
+  newcontent = document.createElement("div");
+  /* newcontent.innerHTML = "<br>" */
+  settingsModalContent.appendChild(newcontent);
+
+  //FLUID POINTER
+  checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.setAttribute("class", "pointerCursor");
+  checkbox.setAttribute("id", "fluidPointChBox");
+  checkbox.checked = true;
+  checkbox.addEventListener("click", function() {
+    fluidPointActive = document.getElementById("fluidPointChBox").checked;
+    draw(vis_canvas, posx, posy);
+  });
+  settingsModalContent.appendChild(checkbox);
+
+  label = document.createElement("label");
+  label.setAttribute("for", "fluidPointChBox");
+  label.setAttribute("title", '"Fluid" vs. fixed symmetrical circle/pointer');
+  label.innerHTML = '"Fluid" pointer';
+  settingsModalContent.appendChild(label);
+
+  newcontent = document.createElement("div");
+  /*     newcontent.innerHTML = "<br>" */
+  settingsModalContent.appendChild(newcontent);
+
+  //HIGHLIGHT MASK BOUNDARIES
+  checkboxMskBnd = document.createElement("input");
+  checkboxMskBnd.type = "checkbox";
+  checkboxMskBnd.setAttribute("class", "pointerCursor");
+  checkboxMskBnd.setAttribute("id", "maskBoundariesChBox");
+  checkboxMskBnd.checked = false;
+  checkboxMskBnd.addEventListener("click", function() {
+    highlightMaskBoundaries = checkboxMskBnd.checked;
+    requestAnimationFrame(simpleDrawCanvas);
+  });
+  settingsModalContent.appendChild(checkboxMskBnd);
+
+  labelMskBnd = document.createElement("label");
+  labelMskBnd.setAttribute("for", "maskBoundariesChBox");
+  labelMskBnd.setAttribute(
+    "title",
+    "Highligts mask boundaries by reducing opacity of central parts"
+  );
+  labelMskBnd.innerHTML = "Highlight mask boundaries";
+  settingsModalContent.appendChild(labelMskBnd);
+
+  newcontent = document.createElement("div");
+  /*     newcontent.innerHTML = "<br>" */
+  settingsModalContent.appendChild(newcontent);
+
+  //Don't segment zero
+  checkboxDSZ = document.createElement("input");
+  checkboxDSZ.type = "checkbox";
+  checkboxDSZ.setAttribute("class", "pointerCursor");
+  checkboxDSZ.setAttribute("id", "dontSegmentZeroChBox");
+  checkboxDSZ.checked = false;
+  checkboxDSZ.addEventListener("click", function() {
+    dontSegmentZero = checkboxDSZ.checked;
+    requestAnimationFrame(simpleDrawCanvas);
+  });
+  settingsModalContent.appendChild(checkboxDSZ);
+
+  labelDSZ = document.createElement("label");
+  labelDSZ.setAttribute("for", "dontSegmentZeroChBox");
+  labelDSZ.setAttribute(
+    "title",
+    "Limits segmentation to only overwrite other segmentations and not segment background. To overwrite other labels, they still need to be unlocked."
+  );
+  labelDSZ.innerHTML = "Don't segment zero";
+  settingsModalContent.appendChild(labelDSZ);
+
+  newcontent = document.createElement("div");
+  settingsModalContent.appendChild(newcontent);
+
+  //SAVE AS NII.GZ
+  checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.setAttribute("class", "pointerCursor");
+  checkbox.setAttribute("id", "saveAsGZCheckbox");
+  checkbox.checked = false;
+  checkbox.addEventListener("click", function() {
+    saveAsGZ = document.getElementById("saveAsGZCheckbox").checked;
+  });
+  settingsModalContent.appendChild(checkbox);
+
+  label = document.createElement("label");
+  label.setAttribute("for", "saveAsGZCheckbox");
+  label.setAttribute(
+    "title",
+    "Saves as nii.gz instead of .nii. May take a few seconds extra when saving"
+  );
+  label.innerHTML = "Gzip when saving nifti";
+  settingsModalContent.appendChild(label);
+
+  div = document.createElement("div");
+  div.innerHTML = "<br>";
+  settingsModalContent.appendChild(div);
+
+  //SEGMENT ABOVE AND BELOW
+  div = document.createElement("div");
+  inputAboveBelow = document.createElement("input");
+  inputAboveBelow.value = 0;
+  inputAboveBelow.style.width = "15px";
+  div.innerHTML = "Segment nr. of slices above and below: ";
+  div.setAttribute(
+    "title",
+    "Segments (or erases) this many slices above and below of current. Only relevant for manual segmentation (including thresholding). Default is 0, meaning segmentation only occurs in the viewable slice. Can be changed to any number"
+  );
+  div.appendChild(inputAboveBelow);
+  settingsModalContent.appendChild(div);
+
+  inputAboveBelow.addEventListener("input", function() {
+    segmentAboveBelow = parseInt(inputAboveBelow.value);
+  });
+  /* inputAboveBelow.addEventListener("click", function(){
+        inputAboveBelow.select()
+    }) */
+
+  div = document.createElement("div");
+  div.innerHTML = "<br>";
+  settingsModalContent.appendChild(div);
+
+  //CHANGE MASKVALUE FROM TO
+
+  div = document.createElement("div");
+  text = document.createElement("text");
+  text.innerHTML = "Change maskvalue from: ";
+  div.appendChild(text);
+
+  let chMskValFrom = 1;
+  let chMskValTo = 2;
+  let inputFromVal = document.createElement("input");
+  inputFromVal.value = 1;
+  inputFromVal.style.width = "15px";
+  inputFromVal.addEventListener("input", function() {
+    chMskValFrom = parseInt(inputFromVal.value);
+    console.log("change from = " + String(chMskValFrom));
+  });
+  /* inputFromVal.addEventListener("click", function(){
+        inputFromVal.select()
+    }) */
+  div.appendChild(inputFromVal);
+
+  text = document.createElement("text");
+  text.innerHTML = " to value: ";
+  div.appendChild(text);
+
+  inputToVal = document.createElement("input");
+  inputToVal.value = 2;
+  inputToVal.style.width = "15px";
+  inputToVal.addEventListener("input", function() {
+    chMskValTo = parseInt(inputToVal.value);
+    console.log("change to = " + String(chMskValTo));
+  });
+  /* inputToVal.addEventListener("click", function(){
+        inputToVal.select()
+    }) */
+  div.appendChild(inputToVal);
+
+  text = document.createElement("text");
+  text.innerHTML = " ";
+  div.appendChild(text);
+
+  let buttonChange = document.createElement("button");
+  buttonChange.innerText = "Change";
+  buttonChange.setAttribute("class", "modalButton");
+  buttonChange.addEventListener("click", function() {
+    changeLabelValue(chMskValFrom, chMskValTo);
+  });
+
+  div.setAttribute(
+    "title",
+    "Changes all of selected maskvalue to another value in the whole volume. Changing to 0 deletes that mask. Overrides locks. Be careful as there is no undo. Consider saving segmentation as backup."
+  );
+  div.appendChild(buttonChange);
+
+  settingsModalContent.appendChild(div);
+
+  //UPLOAD DATA TO MEDSEG SERVER
+  div = document.createElement("div");
+  div.innerHTML = "<br><br>";
+  settingsModalContent.appendChild(div);
+
+  //contribute image data and segmentation
+  //enter where data comes from
+  //alert are you sure you want to upload?
+
+  //QUIZ
+  let buttonQuiz = document.createElement("button");
+
+  buttonQuiz.setAttribute("class", "modalButton");
+  buttonQuiz.innerHTML = "Start quiz";
+  settingsModalContent.appendChild(buttonQuiz);
+  buttonQuiz.addEventListener("click", function() {
+    if (!quizMode) {
+      quizMode = true;
+
+      buttonQuiz.innerHTML = "Abort quiz";
+      let modal = document.getElementById("settingsModal");
+      modal.style.display = "none";
+      modalVisible = false;
+      quizInit();
+    } else {
+      buttonQuiz.innerHTML = "Start quiz";
+      let modal = document.getElementById("settingsModal");
+      modal.style.display = "none";
+      modalVisible = false;
+      quizAbort();
+    }
+  });
+
+  //SAVE MASK CONFIGURATION FILE
+  div = document.createElement("div");
+  div.innerHTML = "<br>";
+  settingsModalContent.appendChild(div);
+  let buttonSaveConfig = document.createElement("button");
+  buttonSaveConfig.innerText = "Save config file";
+  buttonSaveConfig.setAttribute("class", "modalButton");
+  buttonSaveConfig.addEventListener("click", function() {
+    saveLabels();
+  });
+  buttonSaveConfig.setAttribute(
+    "title",
+    "Downloads the config file which stores mask names and colors."
+  );
+  settingsModalContent.appendChild(buttonSaveConfig);
+
+  //FILENAME AND SAVE IMAGE FILE AS NII
+  div = document.createElement("div");
+  div.innerHTML = "<br>";
+
+  text = document.createElement("text");
+  text.innerHTML = "Filename: ";
+  div.appendChild(text);
+
+  let inputFileName = document.createElement("input");
+  inputFileName.value = "undefined";
+  inputFileName.style.width = "80px";
+  inputFileName.setAttribute("id", "inputFileName");
+
+  inputFileName.addEventListener("input", function(evt) {
+    thectx.fileName = inputFileName.value;
+  });
+  /* inputFileName.addEventListener("click", function(){
+        inputFileName.select()
+    }) */
+
+  div.appendChild(inputFileName);
+
+  text = document.createElement("text");
+  text.innerHTML = " ";
+  div.appendChild(text);
+
+  let buttonSaveImage = document.createElement("button");
+  buttonSaveImage.innerText = "Save image (as nifti)";
+  buttonSaveImage.setAttribute("class", "modalButton");
+  buttonSaveImage.addEventListener("click", function() {
+    saveImage();
+  });
+  buttonSaveImage.setAttribute("title", "Saves loaded image as nifti");
+  div.appendChild(buttonSaveImage);
+
+  settingsModalContent.appendChild(div);
+
+  //DO NOT SEGMENT ZERO checkbox dontSegmentZero
+  //POINTER COLOR
+  //ZOOM OF ALLTEXT
+})();
+//settingsCreateModal();
+
+(function() {
+  let segSlFrom = 0;
+  let segSlTo = 0;
+
+  let div = document.getElementById("SegmentSelectedSlices");
+
+  let text = document.createElement("text");
+  text.innerHTML = "<br>Automatically segment from slice nr. ";
+  div.appendChild(text);
+
+  let inputFromSlice = document.createElement("input");
+  inputFromSlice.value = 0;
+  inputFromSlice.style.width = "25px";
+  inputFromSlice.addEventListener("input", function() {
+    segSlFrom = parseInt(inputFromSlice.value);
+  });
+  div.appendChild(inputFromSlice);
+
+  text = document.createElement("text");
+  text.innerHTML = " to slice nr. ";
+  div.appendChild(text);
+
+  let inputToSlice = document.createElement("input");
+  inputToSlice.value = 0;
+  inputToSlice.style.width = "25px";
+  inputToSlice.addEventListener("input", function() {
+    segSlTo = parseInt(inputToSlice.value);
+  });
+  div.appendChild(inputToSlice);
+
+  text = document.createElement("text");
+  text.innerHTML = " ";
+  div.appendChild(text);
+
+  let button = document.createElement("button");
+  button.innerText = "Run segmentation";
+  button.setAttribute("class", "modalButton");
+  button.addEventListener("click", function() {
+    if (selectedModel.name == "none") {
+      return;
+    }
+
+    let modal = document.getElementById("modelsModal");
+    modal.style.display = "none";
+    modalVisible = false;
+
+    let a;
+    for (let i = segSlFrom, p = Promise.resolve(); i <= segSlTo; i += 1) {
+      a = segSlTo;
+      p = p.then(
+        _ =>
+          new Promise(resolve =>
+            setTimeout(function() {
+              thectx.slider.value = a;
+              upperLeftInfoBar.innerHTML =
+                "Segmenting. " + String(a - segSlFrom) + " slices left";
+              tf.tidy(() => {
+                predictCurrentSlice(
+                  selectedModel,
+                  windowedImageDataPredicting,
+                  (sync = true)
+                );
+              });
+              drawCanvas(thectx);
+              a--;
+              if (a - segSlFrom < 0) {
+                upperLeftInfoBar.innerHTML = " ";
+              }
+              resolve();
+            }, 0)
+          )
+      );
+      upperLeftInfoBar.innerHTML = " ";
+    }
+  });
+  div.appendChild(button);
+
+  text = document.createElement("text");
+  text.innerHTML = "<br><br><br>";
+  div.appendChild(text);
+
+  //div.style.height="100px"
+})();
